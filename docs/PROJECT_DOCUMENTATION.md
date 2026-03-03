@@ -47,6 +47,11 @@ The framework is designed around typed artifacts and a sequential orchestration 
 
 ## Workflow And Architecture
 
+Diagrams:
+
+- [Architecture Diagram](diagrams/ARCHITECTURE_DIAGRAM.md)
+- [Pipeline Sequence Diagram](diagrams/PIPELINE_SEQUENCE.md)
+
 ## High-Level Flow
 
 1. The user submits a natural-language request.

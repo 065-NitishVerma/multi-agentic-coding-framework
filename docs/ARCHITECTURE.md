@@ -4,6 +4,11 @@
 
 The framework is organized as a linear orchestration pipeline with agent-generated artifacts flowing from one stage to the next. The pipeline is implemented in `src/ma_framework/orchestration/pipeline.py`.
 
+## Diagrams
+
+- [Architecture Diagram](diagrams/ARCHITECTURE_DIAGRAM.md)
+- [Pipeline Sequence Diagram](diagrams/PIPELINE_SEQUENCE.md)
+
 ## Core Components
 
 ### Agents
