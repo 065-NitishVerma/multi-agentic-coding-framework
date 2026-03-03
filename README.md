@@ -4,8 +4,8 @@ A Python multi-agent coding framework built with AutoGen. The system takes a nat
 
 Primary submission documentation:
 
-- [Project Documentation](C:/Users/Lenovo/Desktop/multi_agent_framework/docs/PROJECT_DOCUMENTATION.md)
-- [Architecture](C:/Users/Lenovo/Desktop/multi_agent_framework/docs/ARCHITECTURE.md)
+- [Project Documentation](docs/PROJECT_DOCUMENTATION.md)
+- [Architecture](docs/ARCHITECTURE.md)
 
 ## Implemented Agents
 
@@ -131,5 +131,5 @@ Saved artifacts are written to:
 
 ## Additional Documentation
 
-- [Project Documentation](C:/Users/Lenovo/Desktop/multi_agent_framework/docs/PROJECT_DOCUMENTATION.md)
-- [Architecture](C:/Users/Lenovo/Desktop/multi_agent_framework/docs/ARCHITECTURE.md)
+- [Project Documentation](docs/PROJECT_DOCUMENTATION.md)
+- [Architecture](docs/ARCHITECTURE.md)
