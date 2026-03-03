@@ -1,0 +1,129 @@
+import json
+
+from ma_framework.core.models import RunResult
+from ma_framework.orchestration import pipeline
+
+
+class StubAgent:
+    def __init__(self, responses):
+        self._responses = list(responses)
+        self._index = 0
+
+    def generate_reply(self, messages):
+        if self._index < len(self._responses):
+            response = self._responses[self._index]
+            self._index += 1
+            return response
+        return self._responses[-1]
+
+
+def test_run_pipeline_generates_documentation(monkeypatch):
+    monkeypatch.setattr(pipeline, "new_run_id", lambda: "test-run-id")
+    monkeypatch.setattr(
+        pipeline,
+        "build_requirement_agent",
+        lambda: StubAgent(
+            [
+                json.dumps(
+                    {
+                        "problem": "Add two numbers.",
+                        "inputs": ["a", "b"],
+                        "outputs": ["integer"],
+                        "constraints": [],
+                        "edge_cases": [],
+                        "acceptance_criteria": ["Returns the sum."],
+                        "non_functional_requirements": [],
+                    }
+                )
+            ]
+        ),
+    )
+    monkeypatch.setattr(
+        pipeline,
+        "build_test_agent",
+        lambda: StubAgent(
+            [
+                json.dumps(
+                        {
+                            "module_filename": "solution.py",
+                            "module_import": "solution",
+                            "entrypoint": "solve",
+                            "filename": "test_solution.py",
+                            "code": (
+                                "import solution as s\n\n"
+                                "def test_sum():\n"
+                                "    assert s.solve(2, 3) == 5\n"
+                            ),
+                    }
+                )
+            ]
+        ),
+    )
+    monkeypatch.setattr(
+        pipeline,
+        "build_coding_agent",
+        lambda: StubAgent(
+            [
+                json.dumps(
+                        {
+                            "filename": "solution.py",
+                            "code": (
+                                "def solve(a, b):\n"
+                                '    """Return the sum of two integers."""\n'
+                                "    return a + b\n"
+                            ),
+                        }
+                )
+            ]
+        ),
+    )
+    monkeypatch.setattr(
+        pipeline,
+        "build_review_agent",
+        lambda: StubAgent(
+            [
+                json.dumps(
+                    {
+                        "approved": True,
+                        "issues": [],
+                        "suggestions": [],
+                    }
+                )
+            ]
+        ),
+    )
+    monkeypatch.setattr(
+        pipeline,
+        "build_documentation_agent",
+        lambda: StubAgent(
+            [
+                json.dumps(
+                    {
+                        "filename": "DOCUMENTATION.md",
+                        "content": "# Sum Module\\n\\n## Usage\\n\\nCall `solve(a, b)` to add two numbers.\\n",
+                    }
+                )
+            ]
+        ),
+    )
+
+    def fake_run_pytest(**kwargs):
+        return pipeline.PytestResult(
+            passed=True,
+            exit_code=0,
+            stdout="1 passed",
+            stderr="",
+        )
+
+    saved = {}
+
+    monkeypatch.setattr(pipeline, "run_pytest", fake_run_pytest)
+    monkeypatch.setattr(pipeline, "save_run", lambda run_id, payload: saved.setdefault(run_id, payload))
+
+    result = pipeline.run_pipeline("Add two integers.", max_iters=2)
+
+    assert isinstance(result, RunResult)
+    assert result.documentation is not None
+    assert result.documentation.filename == "DOCUMENTATION.md"
+    assert "solve(a, b)" in result.documentation.content
+    assert saved["test-run-id"]["documentation"]["filename"] == "DOCUMENTATION.md"
